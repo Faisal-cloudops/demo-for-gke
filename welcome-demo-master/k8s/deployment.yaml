@@ -1,0 +1,41 @@
+---
+apiVersion: "extensions/v1beta1"
+kind: "Deployment"
+metadata:
+  name: "welcome-app"
+  namespace: "default"
+  labels:
+    app: "welcome-app"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "welcome-app"
+  template:
+    metadata:
+      labels:
+        app: "welcome-app"
+    spec:
+      containers:
+      - name: "welcome-app"
+        image: "gcr.io/project-kubernetes-242705/welcome"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "welcome-app-hpa"
+  namespace: "default"
+  labels:
+    app: "welcome-app"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "welcome-app"
+    apiVersion: "apps/v1beta1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
